@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,41 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
-<body>
 
+<body>
+    <form id="register">
+        <input type="text" id="nombre" placeholder="Nombre">
+        <input type="email" id="email_register" placeholder="Email">
+        <input type="password" id="password_register" placeholder="Password">
+    </form>
+    <form id="login">
+        <input type="email" id="email_login" placeholder="Email">
+        <input type="password" id="password_login" placeholder="Password">
+    </form>
+    <div class="chat_panel hidden">
+        <h2>Pingochat 💬</h2>
+
+        <!-- Buscador de contactos -->
+        <div class="contacts-search">
+            <input type="text" id="search-contact" placeholder="Buscar contacto...">
+            <ul id="contacts-list">
+                <!-- Aquí se mostrarán los contactos filtrados -->
+            </ul>
+        </div>
+
+        <!-- Área de mensajes -->
+        <div id="messages" class="messages">
+            <!-- Aquí se mostrarán los mensajes -->
+        </div>
+
+        <!-- Formulario para enviar mensajes -->
+        <form id="form-message">
+            <input type="text" id="message-input" placeholder="Escribe tu mensaje..." required>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+    <button id="logout">Cerrar sesión</button>
     <script type="module" src="app.js"></script>
 </body>
+
 </html>

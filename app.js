@@ -83,3 +83,17 @@ export async function enviarMensaje() {
     time: serverTimestamp()
   });
 }
+
+
+onSnapshot(collection(db, "messages"), (snapshot) => {
+  snapshot.forEach((doc) => {
+    let data = doc.data()
+
+    panel_chat.innerHTML = ``;
+
+    let message = document.createElement("div")
+    message.classList.add("message")
+    message.innerHTML = `${data.remitent},${data.mensaj} ,${data.serverTimestamp}`
+    panel_chat.append(message)
+  })
+})

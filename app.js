@@ -1,29 +1,3 @@
-// Importar Firebase modular SDK
-import { initializeApp } from "firebase/app";
-
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  GoogleAuthProvider,
-  signInWithPopup,
-  onAuthStateChanged,
-} from "firebase/auth";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  onSnapshot,
-  serverTimestamp,
-} from "firebase/firestore";
-
 const firebaseConfig = {
   apiKey: "AIzaSyChee8wpWx9i2Az9U6aeYscRo14E7JuEWo",
   authDomain: "pingochat-d18b3.firebaseapp.com",
@@ -34,66 +8,96 @@ const firebaseConfig = {
   measurementId: "G-9CR2H5R418"
 };
 
-const app = initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+// AUTH
+const authBox = document.getElementById("auth");
+const phoneInput = document.getElementById("phone");
+const passInput = document.getElementById("password");
+const msg = document.getElementById("authMsg");
 
+let currentUser = null;
 
-const form_register = document.querySelector("#register");
-const form_login = document.querySelector("#login");
-const panel_chat = document.querySelector(".chat_panel")
-
-form_register.addEventListener("submit", async (e) => {
-  e.preventDefault()
-  const nombre = document.querySelector("#nombre").value;
-  const email_register = document.querySelector("#email_register").value;
-  const password_register = document.querySelector("#password_register").value;
-
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email_register, password_register);
-
-    alert(`Usuario registrado: ${nombre}, ${cred.user.email}`)
-  } catch (e) {
-    alert("Error: " + e.message)
-  }
-});
-
-form_login.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email_login = document.querySelector("#email_login").value;
-  const password_login = document.querySelector("#password_login").value;
-
-  try {
-    const cred_login = await signInWithEmailAndPassword(auth, email_login, password_login)
-
-    alert(`Se inició sesión correctamente con: ${cred_login.user.email}`)
-
-    panel_chat.classList.toggle("hidden");
-  } catch (e) {
-    alert("Error: " + e.message)
-  }
-})
-
-export async function enviarMensaje() {
-  await addDoc(collection(db, "mensajes"), {
-    remitente: remitent,
-    mensaje: mensaj,
-    time: serverTimestamp()
-  });
+function validPhone(phone) {
+  return /^3367\d{5}$/.test(phone);
 }
 
+// REGISTRO
+document.getElementById("register").onclick = async () => {
+  const phone = phoneInput.value.trim();
+  const pass = passInput.value;
 
-onSnapshot(collection(db, "messages"), (snapshot) => {
-  snapshot.forEach((doc) => {
-    let data = doc.data()
+  if (!validPhone(phone))
+    return (msg.textContent = "Teléfono inválido");
 
-    panel_chat.innerHTML = ``;
+  const user = await db.collection("users").doc(phone).get();
+  if (user.exists)
+    return (msg.textContent = "Ese número ya existe");
 
-    let message = document.createElement("div")
-    message.classList.add("message")
-    message.innerHTML = `${data.remitent},${data.mensaj} ,${data.serverTimestamp}`
-    panel_chat.append(message)
-  })
-})
+  await db.collection("users").doc(phone).set({
+    phone,
+    pass,
+    created: Date.now(),
+  });
+
+  msg.textContent = "Registro correcto, ya puedes entrar";
+};
+
+// LOGIN
+document.getElementById("login").onclick = async () => {
+  const phone = phoneInput.value.trim();
+  const pass = passInput.value;
+
+  const user = await db.collection("users").doc(phone).get();
+  if (!user.exists || user.data().pass !== pass)
+    return (msg.textContent = "Credenciales incorrectas");
+
+  currentUser = phone;
+  authBox.style.display = "none";
+};
+
+// CHAT
+const messagesDiv = document.getElementById("messages");
+const input = document.getElementById("messageInput");
+
+document.getElementById("sendBtn").onclick = () => {
+  if (!input.value || !currentUser) return;
+
+  db.collection("messages").add({
+    from: currentUser,
+    text: input.value,
+    time: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+
+  input.value = "";
+};
+
+db.collection("messages")
+  .orderBy("time")
+  .onSnapshot((snap) => {
+    messagesDiv.innerHTML = "";
+    snap.forEach((doc) => {
+      const m = doc.data();
+      const div = document.createElement("div");
+      div.className = "message";
+      div.textContent = `${m.from}: ${m.text}`;
+      messagesDiv.appendChild(div);
+    });
+  });
+
+// 🔍 BUSCADOR DE USUARIOS POR TELÉFONO
+const search = document.querySelector(".chat-header input");
+
+search.addEventListener("change", async () => {
+  const phone = search.value.trim();
+  if (!validPhone(phone)) return alert("Número inválido");
+
+  const user = await db.collection("users").doc(phone).get();
+  if (user.exists) {
+    alert("Usuario encontrado: " + phone);
+    // aquí luego abrimos chat privado
+  } else {
+    alert("Ese usuario no existe");
+  }
+});

@@ -1,48 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
     <title>Pingochat</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 
-<body>
-    <form id="register">
-        <input type="text" id="nombre" placeholder="Nombre">
-        <input type="email" id="email_register" placeholder="Email">
-        <input type="password" id="password_register" placeholder="Password">
-    </form>
-    <form id="login">
-        <input type="email" id="email_login" placeholder="Email">
-        <input type="password" id="password_login" placeholder="Password">
-    </form>
-    <div class="chat_panel hidden">
-        <h2>Pingochat 💬</h2>
+<body class="dark">
+    <div id="auth" class="auth">
+        <h2>Pingochat</h2>
 
-        <!-- Buscador de contactos -->
-        <div class="contacts-search">
-            <input type="text" id="search-contact" placeholder="Buscar contacto...">
-            <ul id="contacts-list">
-                <!-- Aquí se mostrarán los contactos filtrados -->
-            </ul>
-        </div>
+        <input id="phone" placeholder="Teléfono (3367xxxxx)" />
+        <input id="password" type="password" placeholder="Contraseña" />
 
-        <!-- Área de mensajes -->
-        <div id="messages" class="messages">
-            <!-- Aquí se mostrarán los mensajes -->
-        </div>
+        <button id="login">Entrar</button>
+        <button id="register">Registrarse</button>
 
-        <!-- Formulario para enviar mensajes -->
-        <form id="form-message">
-            <input type="text" id="message-input" placeholder="Escribe tu mensaje..." required>
-            <button type="submit">Enviar</button>
-        </form>
+        <p id="authMsg"></p>
     </div>
-    <button id="logout">Cerrar sesión</button>
-    <script type="module" src="app.js"></script>
+
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h1>Pingochat</h1>
+            <nav>
+                <button class="tab active" data-tab="chats"><i class="fa-solid fa-comments"></i> Chats</button>
+                <button class="tab" data-tab="estados"><i class="fa-solid fa-circle-notch"></i> Estados</button>
+                <button class="tab" data-tab="comunidades"><i class="fa-solid fa-users"></i> Comunidades</button>
+                <button class="tab" data-tab="canales"><i class="fa-solid fa-bullhorn"></i> Canales</button>
+                <button class="tab" data-tab="archivados"><i class="fa-solid fa-box-archive"></i> Archivados</button>
+            </nav>
+        </aside>
+
+
+        <!-- MAIN -->
+        <main class="main">
+            <header class="chat-header">
+                <span id="chatTitle">Chats</span>
+                <input type="text" placeholder="Buscar..." />
+            </header>
+
+
+            <section id="content" class="content chats">
+                <div id="messages" class="messages"></div>
+            </section>
+
+
+            <footer class="input-bar">
+                <i class="fa-regular fa-face-smile"></i>
+                <input id="messageInput" type="text" placeholder="Escribe un mensaje" />
+                <button id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+            </footer>
+        </main>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>
